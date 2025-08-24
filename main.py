@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from routers.player import router
 
 app = FastAPI()
 
@@ -6,5 +7,5 @@ app = FastAPI()
 async def root():
     return {'message' : 'Hello World'}
 
-
+app.include_router(router,prefix="/players")
 
