@@ -2,7 +2,13 @@ from pydantic import BaseModel
 
 class Player(BaseModel):
     name : str
+    cantEasy : int
     cantMed : int
     cantHard : int
-    time : float
-    percentageOfWin : float
+    score : int
+    daysActive : int
+    acceptanceRatio : float
+    medRatio : float
+
+
+
