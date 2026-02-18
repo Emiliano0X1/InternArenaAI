@@ -43,35 +43,24 @@ def predict_winner(players : List[Player]):
 
     #3. Send to the function of calculate the variables for the mathematic expression using gauss
     variables = gaussGetVariables(matrix)
-    x1 = sp.Symbol('x1')
-    x2 = sp.Symbol('x2')
-    x3 = sp.Symbol('x3')
 
-    exp = ''
-
-    #4. Here I develop the logic to get the mathematic expression
-
-    for i in range(len(variables)): 
-        current = str(variables[i])
-
-        if float(current) >= 0:
-            exp += " + "
-        
-        if i == len(variables) - 1:
-            exp += current
-        else:
-            exp += f"{current}*x{len(variables) - 1 - i}"
-
-    print("Equation : ", exp)
+    print("Vairables despues del request : ",variables)
 
     #5. Calculate by each player their prediction score, that would help us to determinate who can win
     map = {}
-    expSym = sp.simplify(exp)
 
-    for player in players:
+    b0 = variables[0]
+    b1 = variables[1]
+    b2 = variables[2]
+    b3 = variables[3]
 
-        evalFunc = expSym.evalf(4, subs={x1: player.medRatio, x2: player.daysActive, x3: player.acceptanceRatio})
-        map[player.name] = float(evalFunc)
+    for i,player in enumerate(players):
+        m_norm = dataStandarizared[i,0]
+        d_norm = dataStandarizared[i,1]
+        a_norm = dataStandarizared[i,2]
+        res = b0 + (b1 * m_norm) + (b2 * d_norm) + (b3 * a_norm)
+        
+        map[player.name] = float(res)
     
     #6. Finally I sort the map, to get the higher people based on their overall score
     sorted_map = sorted(map.items(), key =lambda item : item[1], reverse=True)
