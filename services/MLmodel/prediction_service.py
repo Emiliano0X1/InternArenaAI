@@ -1,4 +1,4 @@
-
+""" 
 from utils.math_func import powerElement, multiplyElements, sumElements, normalize, ratioMedium
 import sympy as sp
 from numpy import *
@@ -74,4 +74,4 @@ def predict_winner(players : List[Player]):
 
 
 
-    
+     """

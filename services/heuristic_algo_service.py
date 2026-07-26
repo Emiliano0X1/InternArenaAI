@@ -5,10 +5,10 @@ from models.playerItem import Player
 from services.feature_engineering import enrich_player
 
 WEIGTHS = {
-    "hard_ratio"       : 0.20,
-    "med_ratio"        : 0.25,
-    "acceptanceRatio"  : 0.20,
-    "daysActive"       : 0.15,
+    "hard_ratio"       : 0.25,
+    "med_ratio"        : 0.40,
+    "momentum"         : 0.25,
+    "acceptanceRatio"  : 0.10,
 }
 
 def predict_winner_heuristic(players : List[Player]) -> dict:
@@ -18,6 +18,7 @@ def predict_winner_heuristic(players : List[Player]) -> dict:
     # enrich_player ya calcula hard_ratio y med_ratio; los campos del modelo
     # (acceptanceRatio, daysActive) están disponibles directamente en __dict__
     matrix = np.array([[e.get(f, 0) for f in features] for e in enriched], dtype=float)
+    
 
     # IMPORTANTE: feature_range=(0.1, 1.0) en lugar del default (0, 1).
     # Con (0, 1), el jugador con el MÍNIMO en TODAS las columnas obtiene

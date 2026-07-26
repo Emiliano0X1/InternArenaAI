@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class Player(BaseModel):
@@ -5,10 +6,8 @@ class Player(BaseModel):
     cantEasy : int
     cantMed : int
     cantHard : int
-    score : int
-    daysActive : int
-    acceptanceRatio : float
-    medRatio : float
+    last_active : int
+    recent_submissions : List[str]
 
 
 

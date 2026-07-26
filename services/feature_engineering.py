@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime, timezone
 
 RAW_FEATURES = [
     "easy_count", "med_count", "hard_count",
@@ -11,33 +12,57 @@ DERIVED_FEATURES = [
 ]
 
 MODEL_FEATURES = [
-    "contest_rating", "hard_ratio", "med_ratio", "recent_active_days",
-    "streak_current", "acceptance_ratio"
+    "ranking", "hard_ratio", "med_ratio", "momentum",
+    "acceptance_ratio", "is_new"
 ]
 
 def compute_derived(player : dict) -> dict:
-    # Soporte para ambas convenciones de nombres (camelCase del modelo Pydantic y snake_case interno)
-    total_solved = (player.get("cantEasy", player.get("easy_count", 0))
-                    + player.get("cantMed", player.get("med_count", 0))
-                    + player.get("cantHard", player.get("hard_count", 0)))
-    
-    hard_count = player.get("cantHard", player.get("hard_count", 0))
-    med_count  = player.get("cantMed",  player.get("med_count",  0))
+    #1. Get total for all the next operations
+    total_solved = (player.get("cantEasy")
+                    + player.get("cantMed")
+                    + player.get("cantHard"))
 
+
+    #2. Get Hard ratio
+    hard_count = player.get("cantHard")
     hard_ratio = (hard_count / total_solved if total_solved > 0 else 0.0)
+
+    #3. Get Med ratio
+    med_count  = player.get("cantMed")
     med_ratio  = (med_count  / total_solved if total_solved > 0 else 0.0)
 
-    active_days = player.get("daysActive", player.get("active_days", 0)) or 1
-    recent = player.get("recent_active_days", 0)
-    momentum = recent / active_days
+    # 4. Get Momentum (days active recently)
+    now = datetime.now(timezone.utc).timestamp()
+    last_active = player.get("last_active")
 
-    consistency_score = player.get("consistency_score", 0.5)
+    MAX_DAYS = 10
+
+    if last_active:
+        days_since = max(0.0, (now - last_active) / 86400)
+        momentum = max(0.0, 1.0 - (days_since / MAX_DAYS))
+    else:
+        momentum = 0.0
+
+
+    # 5. Calculate acceptance_ratio
+    recent_submissions = player.get("recent_submissions", [])
+
+    N = len(recent_submissions)
+
+    if N > 0:
+        accepted_recent = sum(1 for sub in recent_submissions if sub == 'ACCEPTED')
+
+        k = 3.0
+        global_avg = 0.50
+        acceptance_ratio = (accepted_recent + (k * global_avg)) / (N + k)
+    else:
+        acceptance_ratio = 0.25
 
     return {
         "hard_ratio"       : hard_ratio,
         "med_ratio"        : med_ratio,
         "momentum"         : momentum,
-        "consistency_score": consistency_score
+        "acceptance_ratio": acceptance_ratio
     }
 
 
@@ -48,7 +73,9 @@ def enrich_player(player : dict) -> dict:
         **derived
     }
 
-def load_flat_dataset(matches : list) -> tuple[np.ndarray, np.ndarray]:
+
+
+""" def load_flat_dataset(matches : list) -> tuple[np.ndarray, np.ndarray]:
     rows, labels = [], []
     for match in matches:
         for p in match["players"]:
@@ -66,4 +93,4 @@ def impute_missing(X : np.ndarray) -> np.ndarray:
     col_means = np.nanmean(X, axis = 0)
     inds = np.where(np.isnan(X))
     X[inds] = np.take(col_means, inds[1])
-    return X
+    return X """

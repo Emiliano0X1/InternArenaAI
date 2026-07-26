@@ -1,4 +1,4 @@
-import numpy as np
+""" import numpy as np
 from numpy import *
 
 def gaussGetVariables(arr):
@@ -101,4 +101,4 @@ def gaussGetVariables(arr):
 
 
     print("Resultado : " , result)
-    return result
+    return result """
