@@ -50,7 +50,7 @@ def compute_derived(player : dict) -> dict:
     N = len(recent_submissions)
 
     if N > 0:
-        accepted_recent = sum(1 for sub in recent_submissions if sub == 'ACCEPTED')
+        accepted_recent = sum(1 for status_displayed in recent_submissions if status_displayed == 'ACCEPTED')
 
         k = 3.0
         global_avg = 0.50

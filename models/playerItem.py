@@ -9,5 +9,3 @@ class Player(BaseModel):
     last_active : int
     recent_submissions : List[str]
 
-
-
